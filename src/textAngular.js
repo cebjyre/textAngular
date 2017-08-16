@@ -577,7 +577,7 @@ angular.module('textAngular.DOM', ['textAngular.factories'])
 		) { return false; }
 		return true;
 	};
-	   var outdentListItem = function (itemElement, defaultWrap, options) {
+	var outdentListItem = function (itemElement, defaultWrap, options) {
 		var newContainer, tagName, prev, parent, wrapElem;
 		tagName = itemElement.tagName;
 		prev = itemElement.previousSibling;
@@ -604,7 +604,7 @@ angular.module('textAngular.DOM', ['textAngular.factories'])
 			/* suppose parent of parent is <li>. This adds the new outdented element after it */
 			angular.element(parent.parentNode).after(itemElement);
 			if (parent.childNodes.length === 0) parent.remove();
-			taSelection.setSelectionToElementStart(itemElement.childNodes[0]);
+			taSelection.setSelectionToElementStart(itemElement);
 			return;
 		} else if (angular.element(parent.parentNode).hasClass('ta-bind')) {
 			/* use default wrap to wrap the item content */
@@ -1965,7 +1965,7 @@ angular.module('textAngular.taBind', ['textAngular.factories', 'textAngular.DOM'
 							}else if(event.keyCode === 9 && !event.shiftKey){
 								//console.log('on tab');
 								return onTab(event);
-							}else if(event.keyCode === 13 && !event.shiftKey){
+							}else if(event.keyCode === 13 && !event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey){
 								// console.log('on carrage return (enter)');
 								var $selection;
 								var selection = taSelection.getSelectionElement();
@@ -1987,17 +1987,15 @@ angular.module('textAngular.taBind', ['textAngular.factories', 'textAngular.DOM'
 									taSelection.setSelectionToElementStart(_new[0]);
 									event.preventDefault();
 								}
-								else if (/^<br(|\/)>$/i.test(selection.innerHTML.trim()) && selection.parentNode.tagName.toLowerCase() === 'ol' && !selection.nextSibling) {
+								else if (/^<br(|\/)>$/i.test(selection.innerHTML.trim()) && (selection.parentNode.tagName.toLowerCase() === 'ol' || selection.parentNode.tagName.toLowerCase() === 'ul') && !selection.nextSibling) {
 									onEnter(event)
-								}else if (/^<[^>]+><br(|\/)><\/[^>]+>$/i.test(selection.innerHTML.trim()) && selection.tagName.toLowerCase() === 'ol'){
+								}else if (/^<[^>]+><br(|\/)><\/[^>]+>$/i.test(selection.innerHTML.trim()) && (selection.tagName.toLowerCase() === 'ol' || selection.tagName.toLowerCase() === 'ul' )){
 									onEnter(event)
 								}
 							}
 						}
 					});
 					var _keyupTimeout;
-
-					element.on('keydown', scope.keydownHandler);
 
 					element.on('keyup', scope.events.keyup = function(event, eventData){
 						/* istanbul ignore else: this is for catching the jqLite testing*/
